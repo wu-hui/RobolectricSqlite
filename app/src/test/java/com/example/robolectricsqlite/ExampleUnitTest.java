@@ -38,10 +38,14 @@ public class ExampleUnitTest {
 
     @Override
     public void onConfigure(SQLiteDatabase db) {
-      // Note that this is only called automatically by the SQLiteOpenHelper base class on Jelly
-      // Bean and above.
       configured = true;
+
+      // EXCLUSIVE leads to test failure
       Cursor cursor = db.rawQuery("PRAGMA locking_mode = EXCLUSIVE", new String[0]);
+
+      // NORMAL works
+      // Cursor cursor = db.rawQuery("PRAGMA locking_mode = NORMAL", new String[0]);
+
       cursor.close();
     }
 
@@ -76,13 +80,9 @@ public class ExampleUnitTest {
   public void canRestartSqlite() {
     OpenHelper opener = new OpenHelper(ApplicationProvider.getApplicationContext(), "Testing-DB");
     SQLiteDatabase db = opener.getWritableDatabase();
-    Cursor cursor = db.rawQuery("PRAGMA locking_mode = EXCLUSIVE", new String[0]);
-    cursor.close();
     db.close();
 
     SQLiteDatabase db1 = opener.getWritableDatabase();
-    cursor = db1.rawQuery("PRAGMA locking_mode = EXCLUSIVE", new String[0]);
-    cursor.close();
     db1.close();
   }
 }
